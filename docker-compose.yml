@@ -2,7 +2,7 @@ version: '3'
 
 services:
   kafka:
-    image: spotify/kafka
+    build: ./kafka
     ports:
       - '9092:9092'
     volumes:
