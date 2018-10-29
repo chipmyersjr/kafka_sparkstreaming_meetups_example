@@ -1,0 +1,9 @@
+version: '3'
+
+services:
+  kafka:
+    build: ./kafka
+    ports:
+      - '9092:9092'
+    volumes:
+      - ./src:/home/code

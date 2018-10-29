@@ -1,0 +1,1 @@
+docker exec -d kafka_sparkstreaming_meetups_example_kafka_1 python /home/code/kafka/producer.py
