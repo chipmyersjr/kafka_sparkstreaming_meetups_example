@@ -22,16 +22,6 @@ def main():
     ssc.awaitTermination()
 
 
-def parse_rsvp(message):
-    try:
-        rsvp = json.loads(message[1])
-        _ = rsvp["response"]
-    except JSONDecodeError:
-        return json.loads("{}")
-
-    return rsvp
-
-
 def count_by_responses(rsvps):
     responses = rsvps.map(lambda rsvp: rsvp.get("response") or "invalid") \
                      .filter(lambda response: response != 'invalid') \
@@ -55,6 +45,16 @@ def count_by_responses(rsvps):
 
 def get_redis_connection():
     return redis.Redis(host='172.20.0.7', port=6379)
+
+
+def parse_rsvp(message):
+    try:
+        rsvp = json.loads(message[1])
+        _ = rsvp["response"]
+    except JSONDecodeError:
+        return json.loads("{}")
+
+    return rsvp
 
 
 if __name__ == "__main__":
