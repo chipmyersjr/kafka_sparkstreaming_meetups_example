@@ -15,7 +15,7 @@ services:
                 ipv4_address: 172.20.0.5
 
   spark:
-    image: jupyter/pyspark-notebook
+    build: ./spark_streaming
     ports:
       - '8888:8888'
     volumes:
