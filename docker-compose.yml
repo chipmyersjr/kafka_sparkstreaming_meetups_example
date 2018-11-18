@@ -27,6 +27,13 @@ services:
             frontend:
                 ipv4_address: 172.20.0.6
 
+  redis:
+    image: redis
+    ports:
+      - '6379:6379'
+    networks:
+            frontend:
+                ipv4_address: 172.20.0.7
 
 networks:
   frontend:
