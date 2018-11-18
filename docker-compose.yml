@@ -35,6 +35,17 @@ services:
             frontend:
                 ipv4_address: 172.20.0.7
 
+  django:
+    build: ./django
+    ports:
+      - '8000:8000'
+    volumes:
+      - ./src/webapp/mysite:/usr/src/app
+    networks:
+            frontend:
+                ipv4_address: 172.20.0.8
+
+
 networks:
   frontend:
     ipam:
