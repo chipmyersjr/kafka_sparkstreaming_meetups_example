@@ -3,6 +3,7 @@ from pyspark.streaming import StreamingContext
 from pyspark.streaming.kafka import KafkaUtils
 import json
 from json.decoder import JSONDecodeError
+import redis
 
 
 def main():
@@ -41,14 +42,19 @@ def count_by_responses(rsvps):
             running_count = 0
         return sum(new_values, running_count)
 
-    def convert_response_counts_to_dictionary(rdd):
-        response_count_dict = rdd.collectAsMap()
-        print(response_count_dict)
+    def send_updated_results_to_redis(rdd):
+        response_count_json = json.dumps(rdd.collectAsMap())
+        r = get_redis_connection()
+        r.set('CountByResponse', response_count_json)
 
     response_counts = responses.updateStateByKey(update_function)
-    response_counts.foreachRDD(convert_response_counts_to_dictionary)
+    response_counts.foreachRDD(send_updated_results_to_redis)
 
     return None
+
+
+def get_redis_connection():
+    return redis.Redis(host='172.20.0.7', port=6379)
 
 
 if __name__ == "__main__":
