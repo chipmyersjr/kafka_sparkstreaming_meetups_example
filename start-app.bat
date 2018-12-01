@@ -6,5 +6,10 @@ docker exec -d kafka_sparkstreaming_meetups_example_spark_1 python /home/code/sp
 
 docker exec -it kafka_sparkstreaming_meetups_example_spark_1 jupyter notebook list
 
-docker exec -d kafka_sparkstreaming_meetups_example_django_1 python manage.py runserver
+docker exec -d kafka_sparkstreaming_meetups_example_django_1 bash pip install redis
+
+docker stop kafka_sparkstreaming_meetups_example_django_1
+
+docker start kafka_sparkstreaming_meetups_example_django_1
+
 
