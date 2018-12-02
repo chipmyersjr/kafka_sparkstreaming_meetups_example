@@ -1,3 +1,36 @@
 <meta http-equiv="refresh" content="1">
-<h1>Yes: {{ yes }} </h1>
-<h1>No: {{ no }}</h1>
+<head>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/numeric/1.2.6/numeric.min.js"></script>
+</head>
+
+<body>
+  <div id="myDiv"></div>
+  <script>
+    var color_palette = ['rgb(12, 155, 117)', 'rgb(244, 65, 68)']
+    var line_color = ['rgb(0, 20, 15)', 'rgb(0, 20, 15)']
+    var line_width = 1
+    var text_size = 20
+
+    var data = [{
+                   values: [{{ yes }}, {{ no }}],
+                   labels: ['Yes', 'No'],
+                   type: 'pie',
+                   marker: {
+                                colors: color_palette,
+                                line: {
+                                       color: line_color,
+                                       width: line_width
+                                }
+                   },
+                   insidetextfont: {
+                        size: text_size
+                   }
+     }];
+
+    var layout = {
+        title: 'RSVP Responses: Yes ({{ yes }})  No ({{ no }})'
+    }
+    Plotly.newPlot('myDiv', data, layout);
+  </script>
+</body>
