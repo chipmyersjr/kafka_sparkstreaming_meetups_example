@@ -1,3 +1,19 @@
+<style>
+  body {
+	padding: 0;
+	margin: 0;
+	line-height: 0;
+  }
+  div {
+	margin: 0;
+	border: 0;
+	display: inline-block;
+  }
+  .half {
+	  width: 50%;
+  }
+</style>
+
 <meta http-equiv="refresh" content="1">
 <head>
   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
@@ -5,7 +21,7 @@
 </head>
 
 <body>
-  <div id="myDiv"></div>
+   <div id="myDiv" class="half"></div><div id="top5events" class="half"></div>
   <script>
     var color_palette = ['rgb(12, 155, 117)', 'rgb(244, 65, 68)']
     var line_color = ['rgb(0, 20, 15)', 'rgb(0, 20, 15)']
@@ -32,5 +48,22 @@
         title: 'RSVP Responses: Yes ({{ yes }})  No ({{ no }})'
     }
     Plotly.newPlot('myDiv', data, layout);
+
+    var data = [{
+                  type: 'bar',
+                  x: {{ top_5_events_labels|safe }},
+                  y: {{ top_5_events_values|safe }}
+    }];
+
+    var layout = {
+           autosize: false,
+           width: 1000,
+           height: 750,
+           xaxis: {
+                      automargin: true
+            }
+    };
+
+    Plotly.newPlot('top5events', data, layout);
   </script>
 </body>

@@ -23,16 +23,13 @@ def main():
     rsvps = kafka_stream.map(lambda message: parse_rsvp(message))
 
     count_by_responses(rsvps=rsvps)
+    top_5_events(rsvps=rsvps)
 
     ssc.start()
     ssc.awaitTermination()
 
 
 def count_by_responses(rsvps):
-    responses = rsvps.map(lambda rsvp: rsvp.get("response") or "invalid") \
-                     .filter(lambda response: response != 'invalid') \
-                     .map(lambda response: (response, 1))
-
     def update_function(new_values, running_count):
         if running_count is None:
             running_count = 0
@@ -43,8 +40,44 @@ def count_by_responses(rsvps):
         redis_conn = get_redis_connection()
         redis_conn.set('CountByResponse', response_count_json)
 
+    responses = rsvps.map(lambda rsvp: rsvp.get("response") or "invalid") \
+                     .filter(lambda response: response != 'invalid') \
+                     .map(lambda response: (response, 1))
+
     response_counts = responses.updateStateByKey(update_function)
     response_counts.foreachRDD(send_updated_results_to_redis)
+
+    return None
+
+
+def top_5_events(rsvps):
+    def parse_event(rsvp):
+        try:
+            return rsvp['event']['event_name']
+        except (KeyError, UnicodeDecodeError):
+            return "invalid"
+
+    def send_top_5_events_to_redis(rdd):
+        event_count_json = rdd.collectAsMap()
+        iterator = iter(event_count_json.items())
+        result_dict = {}
+        for _ in range(5):
+            try:
+                next_result = next(iterator)
+                result_dict[next_result[0]] = next_result[1]
+            except StopIteration:
+                return result_dict
+
+        redis_conn = get_redis_connection()
+        redis_conn.set('Top5Events', json.dumps(result_dict))
+
+    responses = rsvps.map(lambda rsvp: parse_event(rsvp)) \
+                     .filter(lambda response: response != 'invalid') \
+                     .map(lambda response: (response, 1)) \
+                     .reduceByKeyAndWindow(lambda x, y: x + y, lambda x, y: x - y, 180, 5) \
+                     .transform(lambda rdd: rdd.sortBy(lambda x: x[1], ascending=False))
+
+    responses.foreachRDD(send_top_5_events_to_redis)
 
     return None
 
